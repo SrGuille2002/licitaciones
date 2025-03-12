@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Estilos CSS -->
+    <style>
+        /* Aseguramos que el body ocupe todo el alto de la pantalla */
+        body {
+            font-family: 'Montserrat', sans-serif; /* Fuente principal */
+            margin: 0; /* Sin márgenes externos */
+            height: 100vh; /* Altura total de la ventana */
+            display: flex; /* Uso de Flexbox para centrar contenido */
+            justify-content: center; /* Centrado horizontal */
+            align-items: center; /* Centrado vertical */
+            background-color: #f4f4f9; /* Fondo claro */
+        }
+
+        /* Contenedor de la información de usuario */
+        .users-info {
+            text-align: center; /* Centrado de texto */
+            padding: 20px; /* Espaciado interno */
+            border-radius: 8px; /* Bordes redondeados */
+            background-color: #fff; /* Fondo blanco */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+            width: 100%; /* Ancho completo */
+            max-width: 400px; /* Ancho máximo de 400px */
+            display: flex; /* Uso de Flexbox para apilar elementos */
+            flex-direction: column; /* Apilar los botones uno debajo del otro */
+            align-items: center; /* Centrado de los botones */
+            position: absolute; /* Posición absoluta para centrar en la pantalla */
+        }
+
+        h2 {
+            margin-bottom: 20px; /* Espacio inferior para separar del contenido */
+        }
+
+        /* Estilo para los botones */
+        .action-btn {
+            padding: 10px 20px; /* Espaciado interno */
+            font-weight: bolder; /* Texto en negrita */
+            font-size: 16px; /* Tamaño de fuente */
+            margin: 10px; /* Margen entre botones */
+            cursor: pointer; /* Cursor de puntero */
+            border: none; /* Sin bordes */
+            background-color: #f85c64; /* Color rojo */
+            color: white; /* Texto en blanco */
+            border-radius: 5px; /* Bordes redondeados */
+            width: 100%; /* Asegura que los botones ocupen todo el ancho disponible */
+            max-width: 400px; /* Limita el ancho máximo de los botones */
+        }
+
+        /* Cambio de color al pasar el ratón sobre los botones */
+        .action-btn:hover {
+            background-color: #f8943c; /* Color naranja */
+        }
+
+        /* Estilo del fondo del pop-up */
+        .popup-overlay {
+            display: none; /* Oculto por defecto */
+            position: fixed; /* Posición fija */
+            top: 0; /* Ajuste vertical */
+            left: 0; /* Ajuste horizontal */
+            width: 100%; /* Ancho completo */
+            height: 100%; /* Altura completa */
+            background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+            justify-content: center; /* Centrado horizontal */
+            align-items: center; /* Centrado vertical */
+            z-index: 9999; /* Capa superior */
+        }
+
+        /* Contenido del pop-up */
+        .popup-content {
+            background-color: white; /* Fondo blanco */
+            padding: 20px; /* Espaciado interno */
+            border-radius: 8px; /* Bordes redondeados */
+            width: 400px; /* Ancho fijo */
+        }
+
+        /* Encabezado del pop-up */
+        .popup-header {
+            font-size: 18px; /* Tamaño de fuente */
+            margin-bottom: 15px; /* Espacio inferior */
+        }
+
+        /* Botón de cierre del pop-up */
+        .popup-close-btn {
+            background-color: #f85c64; /* Color rojo */
+            color: white; /* Texto en blanco */
+            border: none; /* Sin bordes */
+            padding: 10px; /* Espaciado interno */
+            width: 100%; /* Ancho completo */
+            border-radius: 5px; /* Bordes redondeados */
+            cursor: pointer; /* Cursor de puntero */
+            font-weight: bolder; /* Texto en negrita */
+            font-size: 16px; /* Tamaño de fuente */
+        }
+
+        /* Cambio de color al pasar el ratón sobre el botón de cierre */
+        .popup-close-btn:hover {
+            background-color: #f8943c; /* Color naranja */
+        }
+
+        /* Botones dentro del pop-up */
+        .popup-button {
+            padding: 10px 20px; /* Espaciado interno */
+            font-weight: bolder; /* Texto en negrita */
+            font-size: 16px; /* Tamaño de fuente */
+            background-color: #f85c64; /* Color rojo */
+            color: white; /* Texto en blanco */
+            border: none; /* Sin bordes */
+            border-radius: 5px; /* Bordes redondeados */
+            cursor: pointer; /* Cursor de puntero */
+            margin: 10px 5px; /* Margen entre botones */
+        }
+
+        /* Cambio de color al pasar el ratón sobre los botones del pop-up */
+        .popup-button:hover {
+            background-color: #f8943c; /* Color naranja */
+        }
+
+        /* Botón de cierre de sesión */
+        .logout-button {
+            position: absolute; /* Posición absoluta */
+            top: 10px; /* Ajuste vertical */
+            left: 10px; /* Ajuste horizontal */
+            padding: 10px 15px; /* Espaciado interno */
+            background-color: #f85c64; /* Color rojo */
+            color: white; /* Texto en blanco */
+            border: none; /* Sin bordes */
+            border-radius: 5px; /* Bordes redondeados */
+            font-weight: bolder; /* Texto en negrita */
+            font-size: 16px; /* Tamaño de fuente */
+            text-decoration: none; /* Sin subrayado */
+            cursor: pointer; /* Cursor de puntero */
+        }
+
+        /* Cambio de color al pasar el ratón sobre el botón de cierre de sesión */
+        .logout-button:hover {
+            background-color: #f8943c; /* Color naranja */
+            opacity: 0.8; /* Opacidad reducida */
+        }
+    </style>
+</head>
+<body>
+    <!-- Botón para volver a la página principal -->
+    <a href="{{ url_for('home') }}" class="logout-button">Volver</a>
+    <!-- Contenedor principal -->
+    <div class="users-info">
+        <h2>Bienvenido, {{ email }}</h2>
+        <button class="action-btn" id="change-email-btn">Cambiar Correo</button>
+        <button class="action-btn" id="change-password-btn">Cambiar Contraseña</button>
+        <button class="action-btn" type="button"  onclick="window.location.href='/alertas/alerta'">Alertas añadidas</button>
+        <button class="action-btn" id="delete-profile-btn">Eliminar Perfil</button>
+    </div>
+
+    <!-- Popup para cambiar correo -->
+    <div id="change-email-popup" class="popup-overlay">
+        <div class="popup-content">
+            <div class="popup-header">Cambiar Correo</div>
+            <form method="POST" action="/profiles/mod_email" id="change-email-form">
+                <label for="new_email">Nuevo Correo:</label>
+                <input type="email" id="new_email" name="new_email" required placeholder="Introduce nuevo correo" style="width: 96%; padding: 8px; margin-bottom: 10px;" value="{{ new_email }}">
+                <button type="submit" class="popup-button">Actualizar Correo</button>
+            </form>
+            <button class="popup-close-btn" id="close-change-email-popup">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Popup para cambiar contraseña -->
+    <div id="change-password-popup" class="popup-overlay">
+        <div class="popup-content">
+            <div class="popup-header">Cambiar Contraseña</div>
+            <form method="POST" action="/profiles/mod_password" id="change-password-form">
+                <label for="new_password">Nueva Contraseña:</label>
+                <input type="password" id="new_password" name="new_password" required placeholder="Introduce nueva contraseña" style="width: 96%; padding: 8px; margin-bottom: 10px;" value="{{ new_password }}">
+                <button type="submit" class="popup-button">Actualizar Contraseña</button>
+            </form>
+            <button class="popup-close-btn" id="close-change-password-popup">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Popup para eliminar perfil -->
+    <div id="delete-profile-popup" class="popup-overlay">
+        <div class="popup-content">
+            <div class="popup-header">¿Estás seguro de que quieres eliminar tu perfil?</div>
+            <form method="POST" action="/profiles/delete_profile" id="delete-profile-form">
+                <button type="submit" class="popup-button">Eliminar Perfil</button>
+            </form>
+            <button class="popup-close-btn" id="close-delete-profile-popup">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        // Mostrar y ocultar popups
+        document.getElementById('change-email-btn').addEventListener('click', function () {
+            document.getElementById('change-email-popup').style.display = 'flex';
+        });
+
+        // Mostrar el pop-up para cambiar contraseña
+        document.getElementById('change-password-btn').addEventListener('click', function () {
+            document.getElementById('change-password-popup').style.display = 'flex'; // Mostrar el pop-up
+        });
+
+        // Mostrar el pop-up para eliminar perfil
+        document.getElementById('delete-profile-btn').addEventListener('click', function () {
+            document.getElementById('delete-profile-popup').style.display = 'flex'; // Mostrar el pop-up
+        });
+
+        // Cerrar el pop-up para cambiar correo
+        document.getElementById('close-change-email-popup').addEventListener('click', function () {
+            document.getElementById('change-email-popup').style.display = 'none'; // Ocultar el pop-up
+        });
+
+        // Cerrar el pop-up para cambiar contraseña
+        document.getElementById('close-change-password-popup').addEventListener('click', function () {
+            document.getElementById('change-password-popup').style.display = 'none';
+        });
+
+        // Cerrar el pop-up para eliminar perfil
+        document.getElementById('close-delete-profile-popup').addEventListener('click', function () {
+            document.getElementById('delete-profile-popup').style.display = 'none';
+        });
+    </script>
+</body>
+</html>

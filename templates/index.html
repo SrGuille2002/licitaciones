@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>InnovaIRV Licitaciones</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles_licitaciones.css') }}">
+</head>
+<body id="top">
+    <div class="user-info">
+        <!-- Verifica si el usuario ha iniciado sesión (email está presente en la sesión) -->
+        {% if email %}
+            <p>Bienvenido, {{ email }}!</p>
+            <a href="{{ url_for('profile.profile') }}" class="profile-button">Perfil</a>
+            <a href="{{ url_for('logout') }}" class="logout-button">Cerrar sesión</a>
+        {% else %}
+            <a href="{{ url_for('login_register') }}" class="register-button">Registrarse</a>
+        {% endif %}
+    </div>
+
+    <h1 style="text-align: center; font-size: 3.75em;">Licitaciones abiertas</h1>
+
+    <!-- Botón de Consultas Preliminares -->
+    <a href="{{ url_for('consultas') }}">
+        <button style="padding: 0.625em 1.25em; font-size: 1em;">Consultas Preliminares</button>
+    </a>
+    <br><br>
+
+    <!-- Barra de búsqueda -->
+    <form method="GET" action="/datos/get_data_lici" onsubmit="return validateImportes()" style="background-color: #f9f9f9; border: 0.0625em solid #ddd; padding: 0.625em; border-radius: 0.5em;">
+        <!-- Campo de búsqueda de linea 1 -->
+        <div class="form-group">
+            <!-- CPV -->
+            <p style="margin-right: 0.23em; margin-top: 0.625em;">Código CPV</p>
+            <div class="info-icon">
+                <i class="fas fa-info-circle"></i>
+                <div class="tooltip-text">
+                    El Vocabulario Común de Adquisiciones (CPV) es un código de 8 dígitos usado para clasificar las licitaciones de contratos públicos.
+                    Los primeros dígitos indican categorías generales, y los últimos especifican detalles concretos.
+                    <br>
+                    <a href="https://contratos.gobierto.es/cpv" target="_blank">Más información</a>
+                </div>
+            </div>
+            <input type="text" id="cpv_search" name="cpv_search" style="margin-top: 0.625em;" placeholder="CPV" value="{{ cpv_search }}">
+
+            <!-- Importe mínimo -->
+            <p style="margin-right: 0.3125em; margin-top: 0.5em;">Desde</p>
+            <input type="text" id="importe1" name="importe1" style="margin-top: 0.625em;" placeholder="Importe mínimo" value="{{ importe1 }}">
+
+            <!-- Fecha mínima presentación ofertas -->
+            <p style="margin-right: 0.3125em; margin-top: 0.5em;">Fecha mínima presentación ofertas</p>
+            <input type="date" id="fecha1" name="fecha1" style="margin-top: 0.625em; color: #7c7c7c;" placeholder="Fecha mínima" value="{{ fecha1 }}">
+
+            <!-- Tipo de Contrato -->
+            <p style="margin-right: 0.3125em; margin-top: 0.5em;">Tipo de Contrato</p>
+            <select name="contrato" style="margin-top: 0.625em; width: 20%; padding: 0.125em; border-radius: 0.3125em; border: 0.0625em solid #ccc;">
+                <option value="" {% if not contrato %}selected{% endif %}>Seleccione un tipo</option>
+                <option value="Obras" {% if contrato == 'Obras' %}selected{% endif %}>Obras</option>
+                <option value="Servicios" {% if contrato == 'Servicios' %}selected{% endif %}>Servicios</option>
+                <option value="Suministros" {% if contrato == 'Suministros' %}selected{% endif %}>Suministros</option>
+                <option value="Concesión de Obras" {% if contrato == 'Concesión de Obras' %}selected{% endif %}>Concesión de Obras</option>
+                <option value="Concesión de Servicios" {% if contrato == 'Concesión de Servicios' %}selected{% endif %}>Concesión de Servicios</option>
+                <option value="Privado" {% if contrato == 'Privado' %}selected{% endif %}>Privado</option>
+                <option value="Patrimonial" {% if contrato == 'Patrimonial' %}selected{% endif %}>Patrimonial</option>
+                <option value="Gestión de Servicios Públicos" {% if contrato == 'Gestión de Servicios Públicos' %}selected{% endif %}>Gestión de Servicios Públicos</option>
+                <option value="Gestión de Obras Públicas" {% if contrato == 'Gestión de Obras Públicas' %}selected{% endif %}>Gestión de Obras Públicas</option>
+                <option value="Sector público y privado" {% if contrato == 'Sector público y privado' %}selected{% endif %}>Sector público y privado</option>
+                <option value="Administrativo especial" {% if contrato == 'Administrativo especial' %}selected{% endif %}>Administrativo especial</option>
+            </select>
+        </div>
+
+        <!-- Campo de búsqueda de linea 2 -->
+        <div class="form-group">
+            <!-- Palabra clave -->
+            <p style="margin-right: 0.9em;">Palabra Clave</p>
+            <input type="text" name="palabra_clave" placeholder="Palabra clave" value="{{ palabra_clave }}">
+
+            <!-- Importe mínimo -->
+            <p style="margin-right: 0.5625em;">Hasta</p>
+            <input type="text" id="importe2" name="importe2" placeholder="Importe máximo" value="{{ importe2 }}">
+
+            <!-- Fecha máxima presentación ofertas -->
+            <p style="margin-right: 0.125em;">Fecha máxima presentación ofertas</p>
+            <input type="date" id="fecha2" name="fecha2" style="color: #7c7c7c;" placeholder="Fecha máxima" value="{{ fecha2 }}">
+        </div>
+
+        <div class="button-container">
+            <!-- Botón de búsqueda -->
+            <input type="hidden" name="Buscar" value="Buscar">
+            <button type="submit" name="Buscar" class="search-btn">Buscar</button>
+            <!-- Botón de limpieza -->
+            <button type="button" onclick="limpiarCampos()">Limpiar</button>
+            <!-- Menú desplegable para recomendaciones -->
+            {% if email %}
+                <div class="dropdown">
+                    <button type="button" class="recommendations-btn">Top Búsquedas</button>
+                    <div class="dropdown-content">
+                        {% if recomendaciones_principales %}
+                            {% for recomendacion, instancias in recomendaciones_principales %}
+                                <div class="recommendation-item"> {{ recomendacion }} </div>
+                            {% endfor %}
+                        {% else %}
+                            <p>No hay recomendaciones.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+    </form>
+            <!-- Botón Alerta -->
+            <form action="{{ url_for('alerta.nueva_alerta') }}" method="POST">
+                <button type="submit"><i class="fas fa-bell"></i> Guardar búsqueda</button>
+            </form>
+            <div class="info-icon" style="font-size: 1em; margin-top: 0.05em">
+                <i class="fas fa-info-circle"></i>
+                <div class="tooltip-text">
+                    Recibirá por correo electrónico los avisos de las nuevas licitaciones que coincidan con la búsqueda guardada.
+                </div>
+            </div>
+
+            <!-- Mensaje de error con tamaño de fuente reducido -->
+            <p id="error-message-importes" style="color: red; display: none; font-size: 15px; margin: 0.43em;"></p>
+            <p id="error-message-fechas" style="color: red; display: none; font-size: 15px; margin: 0.43em;"></p>
+
+        </div>
+    {% if result %}
+    <!-- Menú desplegable y orden -->
+    <div style="display: flex; justify-content: space-between; align-items: center; height: 0.0625em; margin-left: 0.5em; margin-right: 0.5em; margin-top: 2.2em;">
+        <h2>{{total_results}} resultados:</h2>
+        <div style="display: flex; justify-content: space-between;">
+            <div class="dropdown">
+                <button>Ordenar por</button>
+                <div class="dropdown-content">
+                    <!-- Condicionales para mostrar solo las opciones que no estén activas -->
+                    {% if not (sort_by == 'Fecha_de_presentación_de_ofertas' and order == 'asc') %}
+                        <a href="/datos/get_data_lici?sort_by=Fecha_de_presentación_de_ofertas&order=asc">Fecha de Presentación (Ascendente)</a>
+                    {% endif %}
+                    {% if not (sort_by == 'Fecha_de_presentación_de_ofertas' and order == 'desc') %}
+                        <a href="/datos/get_data_lici?sort_by=Fecha_de_presentación_de_ofertas&order=desc">Fecha de Presentación (Descendente)</a>
+                    {% endif %}
+                    {% if not (sort_by == 'Valor_estimado_del_contrato' and order == 'asc') %}
+                        <a href="/datos/get_data_lici?sort_by=Valor_estimado_del_contrato&order=asc">Importe (Ascendente)</a>
+                    {% endif %}
+                    {% if not (sort_by == 'Valor_estimado_del_contrato' and order == 'desc') %}
+                        <a href="/datos/get_data_lici?sort_by=Valor_estimado_del_contrato&order=desc">Importe (Descendente)</a>
+                    {% endif %}
+                    {% if not (sort_by == 'Fecha_de_presentación_de_solicitudes_de_participacion' and order == 'asc') %}
+                        <a href="/datos/get_data_lici?sort_by=Fecha_de_presentación_de_solicitudes_de_participacion&order=asc">Fecha de solicitud (Ascendente)</a>
+                    {% endif %}
+                    {% if not (sort_by == 'Fecha_de_presentación_de_solicitudes_de_participacion' and order == 'desc') %}
+                        <a href="/datos/get_data_lici?sort_by=Fecha_de_presentación_de_solicitudes_de_participacion&order=desc">Fecha de solicitud (Descendente)</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Indicador de ordenación -->
+            <span class="order-indicator" style="margin-top: 0.5em;">
+                {% if sort_by == 'Fecha_de_presentación_de_ofertas' and order == 'asc' %}
+                    Fecha de Presentación (Ascendente)
+                {% elif sort_by == 'Fecha_de_presentación_de_ofertas' and order == 'desc' %}
+                    Fecha de Presentación (Descendente)
+                {% elif sort_by == 'Valor_estimado_del_contrato' and order == 'asc' %}
+                    Importe (Ascendente)
+                {% elif sort_by == 'Valor_estimado_del_contrato' and order == 'desc' %}
+                    Importe (Descendente)
+                {% elif sort_by == 'Fecha_de_presentación_de_solicitudes_de_participacion' and order == 'asc' %}
+                    Fecha de Presentación (Ascendente)
+                {% elif sort_by == 'Fecha_de_presentación_de_solicitudes_de_participacion' and order == 'desc' %}
+                    Fecha de Presentación (Descendente)
+                {% else %}
+                    Ordenando por: Ninguno
+                {% endif %}
+            </span>
+        </div>
+    </div>
+
+    <!-- Muestra los resultados de la búsqueda -->
+    <div id="result">{{ result | safe }}</div>
+
+    <!-- Paginación -->
+    <div class="pagination">
+        <form method="GET" action="/datos/get_data_lici" style="display: inline;">
+            <input type="hidden" name="page" value="{{ page - 1 }}">
+            <input type="hidden" name="pagina" value="pagina">
+            <button type="submit" {% if page <= 1 %}disabled{% endif %}><i class="fas fa-arrow-left"></i></button>
+        </form>
+
+        <span class="page-number">{{ page }}</span>
+        <span class="slice">/</span>
+        <span class="page-number">{{ total_pages }}</span>
+
+        {% if page < total_pages %}
+            <form method="GET" action="/datos/get_data_lici" style="display: inline;">
+                <input type="hidden" name="pagina" value="pagina">
+                <input type="hidden" name="page" value="{{ page + 1 }}">
+                <button type="submit"><i class="fas fa-arrow-right"></i></button>
+            </form>
+        {% endif %}
+
+        <form method="GET" action="/datos/get_data_lici" style="display: inline; margin-left: 1.875em;">
+            <label for="goto-page">Ir a la página:</label>
+            <input type="hidden" name="pagina" value="pagina">
+            <input type="number" id="goto-page" name="page" min="1" max="{{ total_pages }}" value="{{ page }}" style="width: 3.125em;">
+            <button type="submit">Ir</button>
+        </form>
+        <button onclick="scrollToTop()" class="back-to-top"><i class="fas fa-arrow-up"></i></button>
+    </div>
+    {% else %}
+        <p>No se encontraron resultados.</p>
+    {% endif %}
+
+    <script src="{{ url_for('static', filename='script_licitaciones.js') }}"></script>
+</body>
+</html>

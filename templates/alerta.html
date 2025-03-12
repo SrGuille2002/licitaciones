@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Alertas</title>
+
+    <!-- Estilos CSS -->
+    <style>
+        /* Estilo general del cuerpo */
+        body {
+            font-family: Arial, sans-serif; /* Fuente principal */
+            display: flex; /* Centrar contenido horizontal y verticalmente */
+            align-items: center;
+            justify-content: center;
+            height: 100vh; /* Altura total de la ventana */
+            margin: 0; /* Sin márgenes externos */
+            background-color: #f4f4f9; /* Fondo claro */
+        }
+
+        /* Contenedor principal */
+        .container {
+            width: 100%; /* Ancho completo */
+            max-width: 600px; /* Máximo ancho del contenedor */
+            padding: 20px; /* Espaciado interno */
+            background-color: #fff; /* Fondo blanco */
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+            border-radius: 8px; /* Bordes redondeados */
+        }
+
+        /* Estilo para campos de entrada de texto y desplegables */
+        input[type="text"], #cpv_dropdown {
+            width: 96.3%; /* Ancho ajustado */
+            padding: 10px; /* Espaciado interno */
+            margin: 10px 0; /* Margen superior e inferior */
+            border-radius: 5px; /* Bordes redondeados */
+            border: 1px solid #ccc; /* Borde gris claro */
+        }
+
+        /* Botones principales */
+        button {
+            width: 100%; /* Ancho completo */
+            padding: 10px; /* Espaciado interno */
+            margin-top: 10px; /* Margen superior */
+            border: none; /* Sin bordes */
+            border-radius: 5px; /* Bordes redondeados */
+            color: white; /* Texto en blanco */
+            font-weight: bolder; /* Texto en negrita */
+            font-size: 14px; /* Tamaño de fuente */
+            cursor: pointer; /* Cursor de puntero */
+            background-color: #4CAF50; /* Color verde */
+        }
+
+        /* Estilo para el menú desplegable de CPV */
+        #cpv_dropdown {
+            position: absolute; /* Posición absoluta */
+            top: -150px; /* Ajuste vertical */
+            left: calc(105% + 10px); /* Ajuste horizontal */
+            width: 400px; /* Ancho del menú */
+            max-height: 500px; /* Altura máxima */
+            border: 1px solid #ccc; /* Borde gris claro */
+            background-color: #fff; /* Fondo blanco */
+            overflow-y: auto; /* Barra de desplazamiento vertical */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+            z-index: 1000; /* Capa superior */
+            display: none; /* Oculto por defecto */
+        }
+
+        /* Elementos dentro del menú desplegable */
+        #cpv_dropdown div {
+            padding: 8px; /* Espaciado interno */
+            cursor: pointer; /* Cursor de puntero */
+        }
+
+        /* Efecto hover para elementos del menú desplegable */
+        #cpv_dropdown div:hover {
+            background-color: #f0f0f0; /* Fondo más claro al pasar el ratón */
+        }
+
+        /* Estilo para elementos de lista (alertas) */
+        li {
+            background: #f9f9f9; /* Fondo claro */
+            padding: 10px; /* Espaciado interno */
+            margin-bottom: 5px; /* Espaciado entre elementos */
+            border-radius: 5px; /* Bordes redondeados */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+        }
+
+        /* Contenedor de alertas */
+        .alertas-container {
+            height: 200px; /* Altura fija */
+            overflow-y: auto; /* Barra de desplazamiento vertical */
+            padding: 20px; /* Espaciado interno */
+            border: 1px solid #ccc; /* Borde gris claro */
+            margin-top: 10px; /* Margen superior */
+        }
+
+        /* Botón de cierre de sesión */
+        .logout-button {
+            position: absolute; /* Posición absoluta */
+            top: 10px; /* Ajuste vertical */
+            left: 10px; /* Ajuste horizontal */
+            padding: 10px 15px; /* Espaciado interno */
+            background-color: #f85c64; /* Color rojo */
+            color: white; /* Texto en blanco */
+            border: none; /* Sin bordes */
+            border-radius: 5px; /* Bordes redondeados */
+            font-weight: bolder; /* Texto en negrita */
+            font-size: 14px; /* Tamaño de fuente */
+            text-decoration: none; /* Sin subrayado */
+            cursor: pointer; /* Cursor de puntero */
+        }
+
+        /* Efecto hover para el botón de cierre de sesión */
+        .logout-button:hover {
+            opacity: 0.8; /* Opacidad reducida al pasar el ratón */
+        }
+    </style>
+</head>
+<body>
+    <!-- Botón para volver a la página principal -->
+    <a href="{{ url_for('home') }}" class="logout-button">Volver</a>
+
+    <!-- Contenedor principal -->
+    <div class="container">
+        <h2>Mis Alertas</h2>
+
+        <!-- Lista de alertas -->
+        {% if result %}
+        <div class="alertas-container">
+            {% for alerta in result %}
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                    <!-- Mostrar los campos específicos de cada alerta -->
+                    <div style="flex: 1;">
+                        {% if alerta['cpv'] %} <p><strong>CPV:</strong> {{ alerta['cpv'] }}</p>{% endif %}
+                        {% if alerta['contrato'] %}<p><strong>Contrato:</strong> {{ alerta['contrato'] }}</p>{% endif %}
+                        {% if alerta['palabra_clave'] %}<p><strong>Palabra Clave:</strong> {{ alerta['palabra_clave'] }}</p>{% endif %}
+                        {% if alerta['fecha1'] %}<p><strong>Fecha mínima:</strong> {{ alerta['fecha1'] }}</p>{% endif %}
+                        {% if alerta['fecha2'] %}<p><strong>Fecha máxima:</strong> {{ alerta['fecha2'] }}</p>{% endif %}
+                        {% if alerta['importe1'] %}<p><strong>Importe mínimo:</strong> {{ alerta['importe1'] }}</p>{% endif %}
+                        {% if alerta['importe2'] %}<p><strong>Importe máximo:</strong> {{ alerta['importe2'] }}</p>{% endif %}
+                    </div>
+                    <!-- Botón para eliminar la alerta -->
+                    <form method="POST" action="/alertas/alerta/eliminar" style="margin: 0; padding: 0;">
+                        <input type="hidden" name="alerta_id" value="{{ alerta['id'] }}">
+                        <button type="submit" style="background-color: red; color: white; border: none; border-radius: 5px; cursor: pointer; padding: 5px;">X</button>
+                    </form>
+                </div>
+            {% endfor %}
+        </div>
+        {% else %}
+            <!-- Mensaje si no hay alertas configuradas -->
+            <p>No tienes alertas configuradas.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

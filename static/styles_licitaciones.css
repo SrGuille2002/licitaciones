@@ -1,0 +1,293 @@
+/* Estilos generales para el cuerpo de la página */
+body {
+    font-family: 'Open Sans', sans-serif; /* Establece la fuente principal del sitio */
+    margin-left: 5%; /* Añade un margen izquierdo para centrar el contenido */
+    margin-right: 5%; /* Añade un margen derecho para centrar el contenido */
+    max-width: 5000px; /* Limita el ancho máximo del contenido */
+    min-width: 1200px; /* Establece un ancho mínimo para garantizar una buena visualización en pantallas pequeñas */
+    overflow-x: hidden; /* Evita el desplazamiento horizontal */
+}
+
+/* Estilos para los botones */
+button {
+    background-color: #f85c64; /* Color de fondo del botón (rojo) */
+    color: white; /* Color del texto del botón (blanco) */
+    padding: 0.625em 0.9375em; /* Espaciado interno del botón */
+    border: none; /* Elimina el borde predeterminado */
+    border-radius: 0.25em; /* Redondea las esquinas del botón */
+    cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+    font-weight: bolder; /* Hace que el texto del botón sea más grueso */
+    font-size: 0.875em; /* Tamaño de fuente del texto del botón */
+}
+
+/* Cambia el color del botón cuando el usuario pasa el ratón sobre él */
+button:hover {
+    background-color: #f8943c; /* Cambia el color de fondo a un tono naranja */
+}
+
+/* Contenedor para agrupar botones */
+.button-container {
+    display: flex; /* Usa Flexbox para alinear los botones horizontalmente */
+    align-items: center; /* Alinea los botones verticalmente en el centro */
+    gap: 0.625em; /* Añade espacio entre los botones */
+    margin-top: 0.9375em; /* Añade un margen superior al contenedor */
+}
+
+/* Estilos para el contenedor de resultados */
+#result {
+    margin-top: 2.5em; /* Añade un margen superior para separar los resultados del resto del contenido */
+    white-space: pre-wrap; /* Permite que el texto se ajuste automáticamente */
+    background-color: #f9f9f9; /* Fondo claro para los resultados */
+    padding: 0.9375em; /* Espaciado interno para mejorar la legibilidad */
+    border-radius: 0.5em; /* Redondea las esquinas del contenedor */
+    border: 0.0625em solid #ddd; /* Añade un borde sutil */
+}
+
+/* Estilos para la paginación */
+.pagination {
+    display: flex; /* Usa Flexbox para alinear los elementos de la paginación */
+    justify-content: center; /* Centra los elementos horizontalmente */
+    align-items: center; /* Alinea los elementos verticalmente */
+    margin-top: 1.25em; /* Añade un margen superior */
+}
+
+/* Estilos para los números de página */
+.page-number {
+    margin: 0 0.625em; /* Añade espacio entre los números de página */
+    font-size: 1em; /* Tamaño de fuente para los números de página */
+}
+
+/* Estilos para los elementos de corte (slice) */
+.slice {
+    margin: 0 0.625em; /* Añade espacio entre los elementos */
+    font-size: 1em; /* Tamaño de fuente */
+}
+
+/* Contenedor para menús desplegables */
+.dropdown {
+    position: relative; /* Posiciona el contenedor relativo a su posición normal */
+    display: inline-block; /* Hace que el contenedor ocupe solo el espacio necesario */
+}
+
+/* Contenido del menú desplegable */
+.dropdown-content {
+    display: none; /* Oculta el menú desplegable inicialmente */
+    position: absolute; /* Posiciona el menú absolutamente respecto al contenedor */
+    left: 0; /* Alinea el menú con el borde izquierdo del contenedor */
+    min-width: 15.625em; /* Establece un ancho mínimo para el menú */
+    background-color: #f9f9f9; /* Fondo claro para el menú */
+    border: 0.0625em solid #ddd; /* Añade un borde sutil */
+    border-radius: 0.5em; /* Redondea las esquinas */
+    box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); /* Añade una sombra para dar profundidad */
+    z-index: 1; /* Asegura que el menú esté por encima de otros elementos */
+}
+
+/* Estilos para los enlaces dentro del menú desplegable */
+.dropdown-content a {
+    color: black; /* Color del texto de los enlaces */
+    padding: 0.75em 1em; /* Espaciado interno para los enlaces */
+    text-decoration: none; /* Elimina el subrayado predeterminado */
+    display: block; /* Hace que los enlaces ocupen todo el ancho disponible */
+    cursor: pointer; /* Cambia el cursor al pasar sobre los enlaces */
+}
+
+/* Cambia el color de fondo cuando el usuario pasa el ratón sobre un enlace */
+.dropdown-content a:hover {
+    background-color: #ddd; /* Cambia el fondo a un tono gris claro */
+}
+
+/* Muestra el menú desplegable cuando el usuario pasa el ratón sobre el contenedor */
+.dropdown:hover .dropdown-content {
+    display: block; /* Muestra el menú desplegable */
+}
+
+/* Estilos para el indicador de orden */
+.order-indicator {
+    margin-left: 0.625em; /* Añade un margen izquierdo */
+    font-weight: bold; /* Hace que el texto sea más grueso */
+    color: #ff8c00; /* Color naranja para destacar */
+}
+
+/* Estilos para la información del usuario */
+.user-info {
+    position: absolute; /* Fija la posición del contenedor */
+    top: 2.6875em; /* Distancia desde la parte superior */
+    right: 5.75em; /* Distancia desde la derecha */
+    text-align: right; /* Alinea el texto a la derecha */
+}
+
+/* Estilos para los párrafos dentro de la información del usuario */
+.user-info p {
+    margin: 0; /* Elimina el margen predeterminado */
+    font-size: 0.875em; /* Tamaño de fuente */
+}
+
+/* Estilos para los enlaces y botones dentro de la información del usuario */
+.user-info a, .user-info button {
+    display: block; /* Hace que los elementos ocupen todo el ancho disponible */
+    margin-top: 0.3125em; /* Añade un margen superior */
+    padding: 0.3125em 0.625em; /* Espaciado interno */
+    margin-right: 0.5em; /* Añade un margen derecho */
+    font-size: 0.875em; /* Tamaño de fuente */
+    text-align: center; /* Centra el texto */
+    border: none; /* Elimina el borde predeterminado */
+    border-radius: 0.25em; /* Redondea las esquinas */
+    cursor: pointer; /* Cambia el cursor al pasar sobre los elementos */
+    text-decoration: none; /* Elimina el subrayado predeterminado */
+}
+
+/* Estilos específicos para los botones de cerrar sesión, perfil y registro */
+.logout-button, .profile-button, .register-button {
+    background-color: #f85c64; /* Color de fondo (rojo) */
+    color: white; /* Color del texto (blanco) */
+    font-weight: bolder; /* Hace que el texto sea más grueso */
+}
+
+/* Cambia el color de fondo cuando el usuario pasa el ratón sobre los botones */
+.logout-button:hover, .register-button:hover, .profile-button:hover {
+    background-color: #f8943c; /* Cambia el color de fondo a un tono naranja */
+    opacity: 0.8; /* Reduce la opacidad para un efecto visual */
+}
+
+/* Estilos para los elementos de recomendación */
+.recommendation-item {
+    text-align: left; /* Alinea el texto a la izquierda */
+    text-transform: capitalize; /* Convierte la primera letra de cada palabra en mayúscula */
+    padding: 0.5em; /* Espaciado interno */
+    border-bottom: 0.0625em solid #ddd; /* Añade un borde inferior */
+}
+
+/* Elimina el borde inferior del último elemento de recomendación */
+.recommendation-item:last-child {
+    border-bottom: none;
+}
+
+/* Estilos para los grupos de formulario */
+.form-group {
+    display: flex; /* Usa Flexbox para alinear los elementos */
+    align-items: center; /* Alinea los elementos verticalmente en el centro */
+    gap: 0.625em; /* Añade espacio entre los elementos */
+    margin-bottom: 0.625em; /* Añade un margen inferior */
+}
+
+/* Estilos para los campos de entrada dentro de los grupos de formulario */
+.form-group input {
+    padding: 0.3125em; /* Espaciado interno */
+}
+
+/* Estilos para los párrafos dentro de los grupos de formulario */
+.form-group p {
+    margin: 0; /* Elimina el margen predeterminado */
+}
+
+/* Estilos para el encabezado de los resultados */
+.results-header {
+    display: flex; /* Usa Flexbox para alinear los elementos */
+    justify-content: space-between; /* Distribuye el espacio entre los elementos */
+    align-items: center; /* Alinea los elementos verticalmente en el centro */
+}
+
+/* Estilos para resaltar elementos CPV */
+.highlight-cpv {
+    font-style: italic; /* Aplica estilo cursiva */
+    color: #ff7300; /* Color naranja para destacar */
+    transition: color 0.3s ease; /* Añade una transición suave para el cambio de color */
+}
+
+/* Cambia el color cuando el usuario pasa el ratón sobre el elemento */
+.highlight-cpv:hover {
+    color: #d90000; /* Cambia el color a rojo */
+}
+
+/* Estilos para el contenedor de enlaces */
+.link-container {
+    text-align: right; /* Alinea el texto a la derecha */
+    margin-top: 0.625em; /* Añade un margen superior */
+}
+
+/* Estilos para el contenedor de filas */
+.row-container {
+    display: flex; /* Usa Flexbox para alinear los elementos */
+    justify-content: space-between; /* Distribuye el espacio entre los elementos */
+    align-items: center; /* Alinea los elementos verticalmente en el centro */
+    width: 100%; /* Ocupa todo el ancho disponible */
+    height: 1.5em; /* Establece una altura fija */
+}
+
+/* Estilos para el contenido de la izquierda */
+.left-content {
+    display: flex; /* Usa Flexbox para alinear los elementos */
+    z-index: 1; /* Asegura que el contenido esté por encima de otros elementos */
+}
+
+/* Estilos para el enlace de documentos */
+.document-link {
+    font-size: 1.875em; /* Tamaño de fuente grande */
+    font-weight: bold; /* Hace que el texto sea más grueso */
+    color: #007BFF; /* Color azul para los enlaces */
+    text-decoration: none; /* Elimina el subrayado predeterminado */
+    margin-bottom: 1em; /* Añade un margen inferior */
+}
+
+/* Cambia el estilo del enlace cuando el usuario pasa el ratón sobre él */
+.document-link:hover {
+    text-decoration: underline; /* Subraya el texto */
+}
+
+/* Estilos para el botón "Volver arriba" */
+.back-to-top {
+    position: fixed; /* Fija la posición del botón */
+    bottom: 1.25em; /* Distancia desde la parte inferior */
+    right: 1.25em; /* Distancia desde la derecha */
+    background-color: #007BFF; /* Color de fondo (azul) */
+    color: white; /* Color del texto (blanco) */
+    padding: 0.625em 1.25em; /* Espaciado interno */
+    border: none; /* Elimina el borde predeterminado */
+    border-radius: 0.3125em; /* Redondea las esquinas */
+    cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+    text-decoration: none; /* Elimina el subrayado predeterminado */
+}
+
+/* Cambia el color de fondo cuando el usuario pasa el ratón sobre el botón */
+.back-to-top:hover {
+    background-color: #0056b3; /* Cambia el color de fondo a un tono azul más oscuro */
+}
+
+/* Estilos para el ícono de información */
+.info-icon {
+    font-size: 1em; /* Tamaño de fuente */
+    color: #f8943c; /* Color naranja */
+    cursor: pointer; /* Cambia el cursor al pasar sobre el ícono */
+    position: relative; /* Posiciona el ícono relativo a su posición normal */
+    margin-top: 0.55em; /* Añade un margen superior */
+}
+
+/* Estilos para el texto del tooltip */
+.info-icon .tooltip-text {
+    visibility: hidden; /* Oculta el tooltip inicialmente */
+    width: 18.75em; /* Establece un ancho fijo */
+    background-color: #333; /* Fondo oscuro para el tooltip */
+    color: #fff; /* Texto blanco */
+    text-align: justify; /* Justifica el texto */
+    border-radius: 0.3125em; /* Redondea las esquinas */
+    padding: 0.625em; /* Espaciado interno */
+    position: absolute; /* Posiciona el tooltip absolutamente respecto al ícono */
+    z-index: 1; /* Asegura que el tooltip esté por encima de otros elementos */
+    bottom: 100%; /* Coloca el tooltip encima del ícono */
+    left: 50%; /* Centra el tooltip horizontalmente */
+    margin-left: -3.75em; /* Ajusta la posición horizontal */
+    opacity: 0; /* Inicialmente invisible */
+    transition: opacity 0.3s ease; /* Añade una transición suave para la aparición */
+}
+
+/* Muestra el tooltip cuando el usuario pasa el ratón sobre el ícono */
+.info-icon:hover .tooltip-text {
+    visibility: visible; /* Muestra el tooltip */
+    opacity: 1; /* Hace que el tooltip sea completamente visible */
+}
+
+/* Estilos para los enlaces dentro del tooltip */
+.tooltip-text a {
+    color: #4CAF50; /* Color verde para los enlaces */
+    text-decoration: underline; /* Subraya el texto */
+}

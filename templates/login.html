@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <title>Iniciar Sesión o Registrarse</title>
+
+    <!-- Estilos CSS -->
+    <style>
+        /* Estilo general del cuerpo */
+        body {
+            font-family: Arial, sans-serif; /* Fuente principal */
+            display: flex; /* Centrar contenido horizontal y verticalmente */
+            align-items: center;
+            justify-content: center;
+            height: 100vh; /* Altura total de la ventana */
+            margin: 0; /* Sin márgenes externos */
+            background-color: #f4f4f9; /* Fondo claro */
+        }
+
+        /* Contenedor principal */
+        .container {
+            width: 100%; /* Ancho completo */
+            max-width: 400px; /* Máximo ancho del contenedor */
+            padding: 20px; /* Espaciado interno */
+            background-color: #fff; /* Fondo blanco */
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+            border-radius: 8px; /* Bordes redondeados */
+        }
+
+        /* Estilo para campos de entrada (correo y contraseña) */
+        input[type="email"], input[type="password"] {
+            width: 94%; /* Ancho ajustado */
+            padding: 10px; /* Espaciado interno */
+            margin: 10px 0; /* Margen superior e inferior */
+            border-radius: 5px; /* Bordes redondeados */
+            border: 1px solid #ccc; /* Borde gris claro */
+        }
+
+        /* Botones principales */
+        .button, .submit-btn {
+            width: 100%; /* Ancho completo */
+            background-color: #f85c64; /* Color rojo */
+            padding: 10px; /* Espaciado interno */
+            margin-top: 10px; /* Margen superior */
+            border: none; /* Sin bordes */
+            border-radius: 5px; /* Bordes redondeados */
+            color: white; /* Texto en blanco */
+            font-weight: bolder; /* Texto en negrita */
+            font-size: 16px; /* Tamaño de fuente */
+            cursor: pointer; /* Cursor de puntero */
+            transition: background-color 0.1s ease; /* Transición suave */
+        }
+
+        /* Cambio de color al pasar el ratón */
+        .button:hover, .submit-btn:hover {
+            background-color: #f8943c; /* Color naranja */
+        }
+
+        /* Estilo para mensajes de alerta */
+        .alert {
+            color: red; /* Texto en rojo */
+            font-size: 14px; /* Tamaño de fuente pequeño */
+            margin-top: 10px; /* Margen superior */
+        }
+
+        /* Estilo del enlace "Cambiar contraseña" */
+        #change-password-link {
+            color: blue; /* Texto en azul */
+            text-decoration: underline; /* Subrayado */
+            cursor: pointer; /* Cursor de puntero */
+        }
+
+        /* Estilo del fondo oscuro del pop-up */
+        .popup {
+            display: none; /* Oculto por defecto */
+            position: fixed; /* Posición fija */
+            z-index: 1; /* Capa superior */
+            left: 0; /* Ajuste horizontal */
+            top: 0; /* Ajuste vertical */
+            width: 100%; /* Ancho completo */
+            height: 100%; /* Altura completa */
+            background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+        }
+
+        /* Contenido del pop-up */
+        .popup-content {
+            background-color: white; /* Fondo blanco */
+            margin: 10% auto; /* Centrado vertical y horizontal */
+            padding: 20px; /* Espaciado interno */
+            border: 1px solid #888; /* Borde gris */
+            width: 300px; /* Ancho fijo */
+            text-align: center; /* Alineación centrada */
+            border-radius: 8px; /* Bordes redondeados */
+        }
+
+        /* Botón de cierre */
+        .close {
+            color: #aaa; /* Color gris claro */
+            float: right; /* Alineación a la derecha */
+            font-size: 28px; /* Tamaño de fuente grande */
+            font-weight: bold; /* Texto en negrita */
+            cursor: pointer; /* Cursor de puntero */
+        }
+
+        /* Cambio de color al pasar el ratón sobre el botón de cierre */
+        .close:hover,
+        .close:focus {
+            color: black; /* Texto en negro */
+            text-decoration: none; /* Sin subrayado */
+        }
+    </style>
+</head>
+<body>
+    <!-- Contenedor principal -->
+    <div class="container">
+        <h2 style="color: red;">En mantenimiento. Debido a problemas técnicos las alertas serán eliminadas. Disculpen las molestias</h2>
+        <h2>Bienvenido a Licitaciones Abiertas</h2>
+
+        <!-- Formulario de inicio de sesión y registro -->
+        <form method="POST" action="/">
+            <input type="email" name="email" placeholder="Correo" required>
+            <input type="password" name="password" placeholder="Contraseña" required>
+            <a href="#" id="change-password-link" style="font-size: 0.8em">¿Has olvidado la contraseña?</a>
+
+            <button type="submit" name="action" class="button" value="login">Iniciar sesión</button>
+            <button type="submit" name="action" class="button" value="register">Registrarse</button>
+            <button type="submit" name="action" class="button" value="continue" onclick="skipValidation(event)">Seguir sin registrarse</button>
+        </form>
+
+        <!-- Pop-up para cambiar contraseña -->
+        <div id="change-password-popup" class="popup">
+            <div class="popup-content">
+                <span class="close">&times;</span>
+                <h2>Cambiar Contraseña</h2>
+                <form id="change-password-form" method="POST" action="/profiles/mod_password_email">
+                    <input type="email" name="email" placeholder="Correo electrónico" required>
+                    <input type="password" name="new_password" placeholder="Nueva contraseña" required>
+                    <button type="submit" class="submit-btn">Guardar Cambios</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Mensajes flash de Flask -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert">{{ messages[0] }}</div> <!-- Mostrar mensaje de error o éxito -->
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Lógica JavaScript -->
+    <script>
+        // Función para evitar la validación de los campos al hacer clic en "Seguir sin registrarse"
+        function skipValidation(event) {
+            // Eliminar el atributo 'required' de los campos de correo y contraseña
+            document.querySelector('input[name="email"]').removeAttribute('required');
+            document.querySelector('input[name="password"]').removeAttribute('required');
+        }
+
+        // Obtener referencias a los elementos del DOM
+        const changePasswordLink = document.getElementById("change-password-link"); // Enlace para cambiar contraseña
+        const popup = document.getElementById("change-password-popup"); // Pop-up
+        const closeBtn = document.querySelector(".close"); // Botón de cierre
+
+        // Mostrar el pop-up al hacer clic en "Cambiar contraseña"
+        changePasswordLink.addEventListener("click", function(event) {
+            event.preventDefault(); // Evitar que el enlace redirija
+            popup.style.display = "block"; // Mostrar el pop-up
+        });
+
+        // Cerrar el pop-up al hacer clic en el botón de cierre (×)
+        closeBtn.addEventListener("click", function() {
+            popup.style.display = "none"; // Ocultar el pop-up
+        });
+
+        // Cerrar el pop-up al hacer clic fuera de él
+        window.addEventListener("click", function(event) {
+            if (event.target === popup) { // Si se hace clic en el fondo oscuro
+                popup.style.display = "none"; // Ocultar el pop-up
+            }
+        });
+    </script>
+</body>
+</html>
