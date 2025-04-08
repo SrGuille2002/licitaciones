@@ -330,24 +330,16 @@ def db_update_password_from_user_by_email(email, password):
 
 def db_delete_user(email):
     """
-    Elimina un usuario y sus alertas asociadas basado en su correo electrónico.
+    Elimina un usuario y, por tanto, sus alertas y sus recomendaciones asociadas basado en su correo electrónico.
 
     Args:
         email (str): Correo electrónico del usuario a eliminar.
     """
     with engine.connect() as conn:
         # Ejecutar la consulta SQL
-        user_id = conn.execute(
-            text("SELECT id FROM usuarios WHERE email = :email"),
-            {"email": email}
-        )
         conn.execute(
             text("DELETE FROM usuarios WHERE email = :email"),
             {"email": email}
-        )
-        conn.execute(
-            text("DELETE FROM alertas WHERE id_usuario = :user_id"),
-            {"user_id": user_id}
         )
 
 def db_get_user_by_email(email):
@@ -432,7 +424,7 @@ def db_get_datos(tabla, page, limit, sort_by, order, cpv_search, palabra_clave, 
         SELECT *, COUNT(*) OVER () AS total_count FROM consulta
         WHERE Fecha_límite_de_respuesta >= CURDATE()
             AND Vigente_Anulada_Archivada = 'Vigente'
-            AND (Estado = 'Publicada')
+            AND (Estado = 'En plazo')
         """
     try:
         with engine.connect() as conn:
@@ -482,3 +474,182 @@ def db_get_cpvs():
         cpv_df = pd.read_sql(cpv_query, conn)
         return cpv_df
 
+def db_actualizar_licitaciones(df):
+
+    # Limpiar los datos
+    df = df.replace({pd.NA: None, pd.NaT: None, float('nan'): None})
+    print("Insertando datos de licitaciones")
+
+    with engine.connect() as connection:
+        for _, row in df.iterrows():
+            # Para cada fila del DataFrame, definir la consulta SQL para insertar o actualizar registros en la tabla "licitacion"
+            sql = text("""
+            INSERT INTO licitacion (
+                Identificador, Link_licitación, Fecha_actualización, Vigente_Anulada_Archivada,
+                Primera_publicación, Estado, Número_de_expediente, Objeto_del_Contrato,
+                Valor_estimado_del_contrato, Presupuesto_base_sin_impuestos, Presupuesto_base_con_impuestos,
+                CPV, Tipo_de_contrato, Lugar_de_ejecución, Órgano_de_Contratación, ID_OC_en_PLACSP,
+                NIF_OC, DIR3, Enlace_al_Perfil_de_Contratante_del_OC, Tipo_de_Administración,
+                Código_Postal, Tipo_de_procedimiento, Sistema_de_contratación, Tramitación,
+                Forma_de_presentación_de_la_oferta, Fecha_de_presentación_de_ofertas,
+                Fecha_de_presentación_de_solicitudes_de_participacion, Directiva_de_aplicación,
+                Financiación_Europea_y_fuente, Descripción_de_la_financiación_europea,
+                Subcontratación_permitida, Subcontratación_permitida_porcentaje
+            )
+            SELECT :Identificador, :Link_licitación, :Fecha_actualización, :Vigente_Anulada_Archivada,
+                   :Primera_publicación, :Estado, :Número_de_expediente, :Objeto_del_Contrato,
+                   :Valor_estimado_del_contrato, :Presupuesto_base_sin_impuestos, :Presupuesto_base_con_impuestos,
+                   :CPV, :Tipo_de_contrato, :Lugar_de_ejecución, :Órgano_de_Contratación, :ID_OC_en_PLACSP,
+                   :NIF_OC, :DIR3, :Enlace_al_Perfil_de_Contratante_del_OC, :Tipo_de_Administración,
+                   :Código_Postal, :Tipo_de_procedimiento, :Sistema_de_contratación, :Tramitación,
+                   :Forma_de_presentación_de_la_oferta, :Fecha_de_presentación_de_ofertas,
+                   :Fecha_de_presentación_de_solicitudes_de_participacion, :Directiva_de_aplicación,
+                   :Financiación_Europea_y_fuente, :Descripción_de_la_financiación_europea,
+                   :Subcontratación_permitida, :Subcontratación_permitida_porcentaje
+            ON DUPLICATE KEY UPDATE
+                Link_licitación = VALUES(Link_licitación),
+                Fecha_actualización = VALUES(Fecha_actualización),
+                Vigente_Anulada_Archivada = VALUES(Vigente_Anulada_Archivada),
+                Primera_publicación = VALUES(Primera_publicación),
+                Estado = VALUES(Estado),
+                Número_de_expediente = VALUES(Número_de_expediente),
+                Objeto_del_Contrato = VALUES(Objeto_del_Contrato),
+                Valor_estimado_del_contrato = VALUES(Valor_estimado_del_contrato),
+                Presupuesto_base_sin_impuestos = VALUES(Presupuesto_base_sin_impuestos),
+                Presupuesto_base_con_impuestos = VALUES(Presupuesto_base_con_impuestos),
+                CPV = VALUES(CPV),
+                Tipo_de_contrato = VALUES(Tipo_de_contrato),
+                Lugar_de_ejecución = VALUES(Lugar_de_ejecución),
+                Órgano_de_Contratación = VALUES(Órgano_de_Contratación),
+                ID_OC_en_PLACSP = VALUES(ID_OC_en_PLACSP),
+                NIF_OC = VALUES(NIF_OC),
+                DIR3 = VALUES(DIR3),
+                Enlace_al_Perfil_de_Contratante_del_OC = VALUES(Enlace_al_Perfil_de_Contratante_del_OC),
+                Tipo_de_Administración = VALUES(Tipo_de_Administración),
+                Código_Postal = VALUES(Código_Postal),
+                Tipo_de_procedimiento = VALUES(Tipo_de_procedimiento),
+                Sistema_de_contratación = VALUES(Sistema_de_contratación),
+                Tramitación = VALUES(Tramitación),
+                Forma_de_presentación_de_la_oferta = VALUES(Forma_de_presentación_de_la_oferta),
+                Fecha_de_presentación_de_ofertas = VALUES(Fecha_de_presentación_de_ofertas),
+                Fecha_de_presentación_de_solicitudes_de_participacion = VALUES(Fecha_de_presentación_de_solicitudes_de_participacion),
+                Directiva_de_aplicación = VALUES(Directiva_de_aplicación),
+                Financiación_Europea_y_fuente = VALUES(Financiación_Europea_y_fuente),
+                Descripción_de_la_financiación_europea = VALUES(Descripción_de_la_financiación_europea),
+                Subcontratación_permitida = VALUES(Subcontratación_permitida),
+                Subcontratación_permitida_porcentaje = VALUES(Subcontratación_permitida_porcentaje);
+            """)
+
+            # Ejecutar la consulta SQL pasando los valores de la fila actual como parámetros
+            connection.execute(sql, {
+                'Identificador': row.get('Identificador'),
+                'Link_licitación': row.get('Link_licitación'),
+                'Fecha_actualización': row.get('Fecha_actualización'),
+                'Vigente_Anulada_Archivada': row.get('Vigente_Anulada_Archivada'),
+                'Primera_publicación': row.get('Primera_publicación'),
+                'Estado': row.get('Estado'),
+                'Número_de_expediente': row.get('Número_de_expediente'),
+                'Objeto_del_Contrato': row.get('Objeto_del_Contrato'),
+                'Valor_estimado_del_contrato': row.get('Valor_estimado_del_contrato'),
+                'Presupuesto_base_sin_impuestos': row.get('Presupuesto_base_sin_impuestos'),
+                'Presupuesto_base_con_impuestos': row.get('Presupuesto_base_con_impuestos'),
+                'CPV': row.get('CPV'),
+                'Tipo_de_contrato': row.get('Tipo_de_contrato'),
+                'Lugar_de_ejecución': row.get('Lugar_de_ejecución'),
+                'Órgano_de_Contratación': row.get('Órgano_de_Contratación'),
+                'ID_OC_en_PLACSP': row.get('ID_OC_en_PLACSP'),
+                'NIF_OC': row.get('NIF_OC'),
+                'DIR3': row.get('DIR3'),
+                'Enlace_al_Perfil_de_Contratante_del_OC': row.get('Enlace_al_Perfil_de_Contratante_del_OC'),
+                'Tipo_de_Administración': row.get('Tipo_de_Administración'),
+                'Código_Postal': row.get('Código_Postal'),
+                'Tipo_de_procedimiento': row.get('Tipo_de_procedimiento'),
+                'Sistema_de_contratación': row.get('Sistema_de_contratación'),
+                'Tramitación': row.get('Tramitación'),  # Si no existe, será None
+                'Forma_de_presentación_de_la_oferta': row.get('Forma_de_presentación_de_la_oferta'),
+                'Fecha_de_presentación_de_ofertas': row.get('Fecha_de_presentación_de_ofertas'),
+                'Fecha_de_presentación_de_solicitudes_de_participacion': row.get('Fecha_de_presentación_de_solicitudes_de_participacion'),
+                'Directiva_de_aplicación': row.get('Directiva_de_aplicación'),
+                'Financiación_Europea_y_fuente': row.get('Financiación_Europea_y_fuente'),
+                'Descripción_de_la_financiación_europea': row.get('Descripción_de_la_financiación_europea'),
+                'Subcontratación_permitida': row.get('Subcontratación_permitida'),
+                'Subcontratación_permitida_porcentaje': row.get('Subcontratación_permitida_porcentaje'),
+            })
+
+        print("Actualización finalizada")
+
+def db_actualizar_consultas(df):
+
+    # Limpiar los datos
+    df = df.replace({pd.NA: None, pd.NaT: None, float('nan'): None})
+    print("Insertando datos de consultas")
+
+    with engine.connect() as connection:
+        for _, row in df.iterrows():
+            # Para cada fila del DataFrame, definir la consulta SQL para insertar o actualizar registros en la tabla "consulta"
+            sql = text("""
+            INSERT INTO consulta (
+                Identificador, Link_Consulta, Fecha_actualización, Vigente_Anulada_Archivada, Primera_publicación, Estado, Número_de_consulta_preliminar,
+                Objeto_de_la_consulta, Fecha_de_inicio_de_la_consulta, Fecha_límite_de_respuesta, Dirección_para_presentación, Tipo_de_consulta,
+                Condiciones_o_términos_de_envío_de_la_consulta, Futura_licitación_Tipo_de_contrato, Futura_licitación_Objeto, Futura_licitación_Procedimiento,
+                CPV, Órgano_de_Contratación, ID_OC_en_PLACSP, NIF_OC, DIR3, Enlace_al_Perfil_de_Contratante_del_OC, Tipo_de_Administración, Código_Postal
+            )
+            SELECT :Identificador, :Link_Consulta, :Fecha_actualización, :Vigente_Anulada_Archivada, :Primera_publicación, :Estado, :Número_de_consulta_preliminar,
+                    :Objeto_de_la_consulta, :Fecha_de_inicio_de_la_consulta, :Fecha_límite_de_respuesta, :Dirección_para_presentación, :Tipo_de_consulta,
+                    :Condiciones_o_términos_de_envío_de_la_consulta, :Futura_licitación_Tipo_de_contrato, :Futura_licitación_Objeto, :Futura_licitación_Procedimiento,
+                    :CPV, :Órgano_de_Contratación, :ID_OC_en_PLACSP, :NIF_OC, :DIR3, :Enlace_al_Perfil_de_Contratante_del_OC, :Tipo_de_Administración, :Código_Postal
+            ON DUPLICATE KEY UPDATE
+                Link_Consulta = VALUES(Link_Consulta),
+                Fecha_actualización = VALUES(Fecha_actualización),
+                Vigente_Anulada_Archivada = VALUES(Vigente_Anulada_Archivada),
+                Primera_publicación = VALUES(Primera_publicación),
+                Estado = VALUES(Estado),
+                Número_de_consulta_preliminar = VALUES(Número_de_consulta_preliminar),
+                Objeto_de_la_consulta = VALUES(Objeto_de_la_consulta),
+                Fecha_de_inicio_de_la_consulta = VALUES(Fecha_de_inicio_de_la_consulta),
+                Fecha_límite_de_respuesta = VALUES(Fecha_límite_de_respuesta),
+                Dirección_para_presentación = VALUES(Dirección_para_presentación),
+                Tipo_de_consulta = VALUES(Tipo_de_consulta),
+                Condiciones_o_términos_de_envío_de_la_consulta = VALUES(Condiciones_o_términos_de_envío_de_la_consulta),
+                Futura_licitación_Tipo_de_contrato = VALUES(Futura_licitación_Tipo_de_contrato),
+                Futura_licitación_Objeto = VALUES(Futura_licitación_Objeto),
+                Futura_licitación_Procedimiento = VALUES(Futura_licitación_Procedimiento),
+                CPV = VALUES(CPV),
+                Órgano_de_Contratación = VALUES(Órgano_de_Contratación),
+                ID_OC_en_PLACSP = VALUES(ID_OC_en_PLACSP),
+                NIF_OC = VALUES(NIF_OC),
+                DIR3 = VALUES(DIR3),
+                Enlace_al_Perfil_de_Contratante_del_OC = VALUES(Enlace_al_Perfil_de_Contratante_del_OC),
+                Tipo_de_Administración = VALUES(Tipo_de_Administración),
+                Código_Postal = VALUES(Código_Postal);
+            """)
+
+            # Ejecutar la consulta SQL pasando los valores de la fila actual como parámetros
+            connection.execute(sql, {
+                'Identificador': row.get('Identificador'),
+                'Link_Consulta': row.get('Link_Consulta'),
+                'Fecha_actualización': row.get('Fecha_actualización'),
+                'Vigente_Anulada_Archivada': row.get('Vigente_Anulada_Archivada'),
+                'Primera_publicación': row.get('Primera_publicación'),
+                'Estado': row.get('Estado'),
+                'Número_de_consulta_preliminar': row.get('Número_de_consulta_preliminar'),
+                'Objeto_de_la_consulta': row.get('Objeto_de_la_consulta'),
+                'Fecha_de_inicio_de_la_consulta': row.get('Fecha_de_inicio_de_la_consulta'),
+                'Fecha_límite_de_respuesta': row.get('Fecha_límite_de_respuesta'),
+                'Dirección_para_presentación': row.get('Dirección_para_presentación'),
+                'Tipo_de_consulta': row.get('Tipo_de_consulta'),
+                'Condiciones_o_términos_de_envío_de_la_consulta': row.get('Condiciones_o_términos_de_envío_de_la_consulta'),
+                'Futura_licitación_Tipo_de_contrato': row.get('Futura_licitación_Tipo_de_contrato'),
+                'Futura_licitación_Objeto': row.get('Futura_licitación_Objeto'),
+                'Futura_licitación_Procedimiento': row.get('Futura_licitación_Procedimiento'),
+                'CPV': row.get('CPV'),
+                'Órgano_de_Contratación': row.get('Órgano_de_Contratación'),
+                'ID_OC_en_PLACSP': row.get('ID_OC_en_PLACSP'),
+                'NIF_OC': row.get('NIF_OC'),
+                'DIR3': row.get('DIR3'),
+                'Enlace_al_Perfil_de_Contratante_del_OC': row.get('Enlace_al_Perfil_de_Contratante_del_OC'),
+                'Tipo_de_Administración': row.get('Tipo_de_Administración'),
+                'Código_Postal': row.get('Código_Postal'),
+            })
+
+        print("Actualización finalizada")

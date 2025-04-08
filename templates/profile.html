@@ -143,6 +143,11 @@
             background-color: #f8943c; /* Color naranja */
             opacity: 0.8; /* Opacidad reducida */
         }
+        .alert {
+            color: red; /* Texto en rojo */
+            font-size: 14px; /* Tamaño de fuente pequeño */
+            margin-top: 10px; /* Margen superior */
+        }
     </style>
 </head>
 <body>
@@ -151,6 +156,16 @@
     <!-- Contenedor principal -->
     <div class="users-info">
         <h2>Bienvenido, {{ email }}</h2>
+        <!-- Contenedor para los mensajes flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <p class="alert">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
         <button class="action-btn" id="change-email-btn">Cambiar Correo</button>
         <button class="action-btn" id="change-password-btn">Cambiar Contraseña</button>
         <button class="action-btn" type="button"  onclick="window.location.href='/alertas/alerta'">Alertas añadidas</button>

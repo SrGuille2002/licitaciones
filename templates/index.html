@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>InnovaIRV Licitaciones</title>
+    <title>Licitaciones abiertas</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles_licitaciones.css') }}">
@@ -29,7 +29,7 @@
     <br><br>
 
     <!-- Barra de búsqueda -->
-    <form method="GET" action="/datos/get_data_lici" onsubmit="return validateImportes()" style="background-color: #f9f9f9; border: 0.0625em solid #ddd; padding: 0.625em; border-radius: 0.5em;">
+    <form method="GET" action="/datos/get_data_lici" onsubmit="return validarCampos()" style="background-color: #f9f9f9; border: 0.0625em solid #ddd; padding: 0.625em; border-radius: 0.5em;">
         <!-- Campo de búsqueda de linea 1 -->
         <div class="form-group">
             <!-- CPV -->
@@ -115,13 +115,14 @@
             <div class="info-icon" style="font-size: 1em; margin-top: 0.05em">
                 <i class="fas fa-info-circle"></i>
                 <div class="tooltip-text">
-                    Recibirá por correo electrónico los avisos de las nuevas licitaciones que coincidan con la búsqueda guardada.
+                    Si ha iniciado sesión, recibirá por correo electrónico los avisos de las nuevas licitaciones que coincidan con la búsqueda guardada.
                 </div>
             </div>
 
             <!-- Mensaje de error con tamaño de fuente reducido -->
             <p id="error-message-importes" style="color: red; display: none; font-size: 15px; margin: 0.43em;"></p>
             <p id="error-message-fechas" style="color: red; display: none; font-size: 15px; margin: 0.43em;"></p>
+            <p id="error-message-cpv" style="color: red; display: none; font-size: 15px; margin: 0.43em;"></p>
 
         </div>
     {% if result %}

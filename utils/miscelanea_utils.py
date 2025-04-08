@@ -1,13 +1,12 @@
 from flask import session, Flask, url_for
-from flask_mail import Mail, Message
-from config import SECRET_KEY, MAIL_CONFIG
+from flask_mail import Message
+from config import SECRET_KEY, init_mail
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 
 # Configuración de Flask-Mail
-app.config.update(MAIL_CONFIG)
-mail = Mail(app)
+mail = init_mail(app)
 
 def format_importe(importe):
     """
@@ -164,7 +163,7 @@ def procesar_datos_html(tipo_dato, row, cpvs_con_nombre, MAX_CHARACTERS):
         login_url = url_for('login_register')  # Genera la URL para el inicio de sesión
         document_link = (
             f"<a href='{login_url}' class='document-link' style='font-size: 2em;'>"
-            "Inicia sesión para más información."
+            "Inicie sesión para más información."
             "</a>"
         )
 
@@ -197,5 +196,3 @@ def procesar_datos_html(tipo_dato, row, cpvs_con_nombre, MAX_CHARACTERS):
         return objeto_contrato, cpv_content, document_link, fecha_ofe_html, fecha_sol_html, importe_html
     else: # tipo de dato "consulta"
         return objeto_contrato, cpv_content, document_link, fecha_ofe_html
-
-

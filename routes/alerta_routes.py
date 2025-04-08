@@ -118,11 +118,8 @@ def nueva_alerta():
     importe2 = session.get('importe2', '')
     fecha2 = session.get('fecha2', None)
 
-    importe1 = importe1.replace(".", "")
-    importe2 = importe2.replace(".", "")
-
     # Creamos el string con los valores no vacíos
-    alerta_string = "Nueva alerta: "
+    alerta_string = "Nueva alerta creada:<br>"
     query = f"""
         SELECT ID FROM (
             (SELECT * FROM licitacion WHERE Fecha_actualización >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH) AND Fecha_de_presentación_de_ofertas IS NULL AND
@@ -135,40 +132,41 @@ def nueva_alerta():
     """
 
     if cpv_search:
-        alerta_string += f"CPV: {cpv_search}; "
+        alerta_string += f"CPV: {cpv_search};<br>"
         query += f" AND (CPV LIKE '%%{cpv_search}%%' AND CPV REGEXP CONCAT('(^|;)', '{cpv_search}'))"
     if importe1:
+        importe1 = importe1.replace(".", "")
         importe1_formateado = f"{int(importe1):,}".replace(",", ".")  # Formatear con puntos
-        alerta_string += f"IMPORTE MÍNIMO: {importe1_formateado}; "
+        alerta_string += f"IMPORTE MÍNIMO: {importe1_formateado};<br>"
         query += f" AND Valor_estimado_del_contrato >= '{importe1}'"
+    if importe2:
+        importe2 = importe2.replace(".", "")
+        importe2_formateado = f"{int(importe2):,}".replace(",", ".")  # Formatear con puntos
+        alerta_string += f"IMPORTE MÁXIMO {importe2_formateado};<br>"
+        query += f" AND Valor_estimado_del_contrato <= '{importe2}'"
     if fecha1:
         fecha1_obj = datetime.strptime(fecha1, "%Y-%m-%d")
         fecha1_sql = fecha1_obj.strftime("%Y-%m-%d")
-        alerta_string += f"FECHA MÍNIMA PRESENTACIÓN OFERTAS: {fecha1_sql}; "
+        alerta_string += f"FECHA MÍNIMA PRESENTACIÓN OFERTAS: {fecha1_sql};<br>"
         query += f" AND Fecha_de_presentación_de_ofertas >= '{fecha1_sql}'"
+    if fecha2:
+        fecha2_obj = datetime.strptime(fecha2, "%Y-%m-%d")
+        fecha2_sql = fecha2_obj.strftime("%Y-%m-%d")
+        alerta_string += f"FECHA MÁXIMA PRESENTACIÓN OFERTAS: {fecha2_sql};<br>"
+        query += f" AND Fecha_de_presentación_de_ofertas <= '{fecha2_sql}'"
     if contrato:
-        alerta_string += f"TIPO DE CONTRATO: {contrato}; "
+        alerta_string += f"TIPO DE CONTRATO: {contrato};<br>"
         query += f" AND Tipo_de_contrato = '{contrato}'"
     if palabra_clave:
-        alerta_string += f"PALABRA CLAVE: {palabra_clave}; "
+        alerta_string += f"PALABRA CLAVE: {palabra_clave};<br>"
         query += f"""
                     AND (Objeto_del_Contrato LIKE '%%{palabra_clave}%%' COLLATE utf8mb4_unicode_ci OR
                     Órgano_de_Contratación LIKE '%%{palabra_clave}%%' COLLATE utf8mb4_unicode_ci)
                 """
-    if importe2:
-        importe2_formateado = f"{int(importe2):,}".replace(",", ".")  # Formatear con puntos
-        alerta_string += f"IMPORTE MÁXIMO {importe2_formateado}; "
-        query += f" AND Valor_estimado_del_contrato <= '{importe2}'"
-    if fecha2:
-        fecha2_obj = datetime.strptime(fecha2, "%Y-%m-%d")
-        fecha2_sql = fecha2_obj.strftime("%Y-%m-%d")
-        alerta_string += f"FECHA MÁXIMA PRESENTACIÓN OFERTAS: {fecha2_sql}; "
-        query += f" AND Fecha_de_presentación_de_ofertas <= '{fecha2_sql}'"
+    if len(alerta_string) < 25:
+        flash("No se han encontrado datos para crear alerta", "error")
+        return redirect('/datos/get_data_lici')
 
-    if len(alerta_string) < 10:
-        return redirect('/get_data')
-    # Eliminamos el último punto y coma y espacio si hay alguno
-    alerta_string = alerta_string.rstrip('; ')
     user_id = db_get_user_id_by_email(email)
 
     if not user_id:
@@ -182,11 +180,16 @@ def nueva_alerta():
         db_create_alerta_by_all(user_id, cpv_search, contrato, palabra_clave, fecha1, fecha2, importe1, importe2)
         flash("Se ha añadido la alerta correctamente", "success")
 
-        cuerpo = (f"""
-        {alerta_string}
-
-        Para manejar las alertas creadas, diríjase a su Perfil.
-        """)
+        cuerpo = f"""
+        <div style="font-family: Arial, sans-serif; text-align: center; margin: 0 20px;">
+            <h1 style="font-size: 24px; color: #333;">¡Hola de nuevo, {email}!</h1>
+            <p style="font-size: 14px; color: #333;">{alerta_string}</p>
+            <p style="font-size: 14px; color: #333;">
+                &nbsp;Para manejar las alertas creadas, diríjase a su
+                <a href='https://guillermoppm.pythonanywhere.com/'>Perfil</a>.
+            </p>
+        </div>
+        """
         asunto = "Alerta creada"
         mandar_correo(cuerpo, asunto, email)
 

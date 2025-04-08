@@ -1,11 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from config import SECRET_KEY
+from config import SECRET_KEY, init_mail
 from werkzeug.security import generate_password_hash, check_password_hash
 from utils import limpiar_filtros, datos_licitaciones_filtrados, obtener_recomendaciones_principales, datos_consultas_filtrados, mandar_correo, db_get_user_by_email, db_create_user_by_all
 from routes import alerta_bp, datos_bp, profile_bp
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
+
+mail = init_mail(app)
 
 # Registrar los Blueprints
 app.register_blueprint(alerta_bp, url_prefix='/alertas')
@@ -63,7 +65,6 @@ def login_register():
             mandar_correo(cuerpo, asunto, email)
             session['user_id'] = user['id']
             session['email'] = user['email']
-            flash("Registro exitoso.")
             return redirect(url_for('home'))
 
         # Si se elige iniciar sesión
@@ -72,12 +73,13 @@ def login_register():
             if user and check_password_hash(user['password'], password):
                 session['user_id'] = user['id']
                 session['email'] = user['email']
-                flash("Inicio de sesión exitoso.")
                 return redirect(url_for('home'))
+            elif not user:
+                flash("Usuario no registrado")
+                return redirect(url_for('login_register'))
             else:
                 flash("Nombre de usuario o contraseña incorrectos.")
                 return redirect(url_for('login_register'))
-
     return render_template('login.html')
 
 # Ruta de inicio (home) después de iniciar sesión o elegir navegar sin registro

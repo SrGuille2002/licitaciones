@@ -24,7 +24,8 @@ def mod_email():
     Proceso:
         1. Recupera el correo electrónico actual del usuario desde la sesión.
         2. Obtiene el nuevo correo electrónico del formulario enviado por el usuario.
-        3. Actualiza el correo en la base de datos.
+        3. Comprueba si el nuevo correo ya existe. Si existe, no modifica el correo
+        3. Si no existe, actualiza el correo en la base de datos.
         4. Actualiza el correo en la sesión del usuario.
         5. Muestra un mensaje de éxito ('flash') y redirige al perfil del usuario.
 
@@ -33,8 +34,13 @@ def mod_email():
     """
     email = session['email']
     new_email = request.form.get('new_email', '').strip()
-    db_update_email_from_user_by_email(email, new_email)
-    flash("Correo cambiado con éxito")
+    email_repetido = db_get_user_by_email(new_email)
+    if email_repetido:
+        flash("El correo ya está en uso. Elija otro.", "error")
+        return redirect('/profiles/profile')
+    else:
+        db_update_email_from_user_by_email(email, new_email)
+        flash("Correo cambiado con éxito", "success")
     session['email'] = new_email
     return redirect('/profiles/profile')
 

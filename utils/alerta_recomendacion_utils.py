@@ -126,6 +126,7 @@ def mandar_alertas():
                 with engine.connect() as conn:
                     # Seleccionar las licitaciones que coincidan con los datos de la alerta
                     licitaciones = pd.read_sql(query, conn)
+                # Crear el cuerpo del correo
                 body = f"""
                     <div style="font-family: Arial, sans-serif; text-align: center; margin: 0 20px;"> <!-- Margen pequeño para móviles -->
                         <h1 style="font-size: 24px; color: #333;">¡Hola de nuevo, {email}!</h1>
@@ -145,14 +146,18 @@ def mandar_alertas():
                         if not hay_minimo_una_licitacion:
                             contador = 1
                         hay_minimo_una_licitacion = True
+                        # Comprobar si hay valores nulos
+                        fecha_limite = row['Fecha_de_presentación_de_ofertas'] or 'No disponible'
+                        organo_contratacion = row['Órgano_de_Contratación'] or 'No disponible'
+                        importe = row['Valor_estimado_del_contrato'] or 'No disponible'
                         # Construir una representación de la licitación en el correo
                         body += f"""
                             <div style="background-color: #f9f9f9; color: #333; border-radius: 8px; padding: 15px; margin: 0 10%; margin-bottom: 1.5em; max-width: 800px; margin-left: auto; margin-right: auto;">
                                 <p><b>{contador}. {row['Objeto_del_Contrato']}</b></p>
                                 <ul style="list-style-type: disc; padding-left: 20px;">
-                                    <li><b>Fecha límite:</b> {row['Fecha_de_presentación_de_ofertas']}</li>
-                                    <li><b>Órgano de contratación:</b> {row['Órgano_de_Contratación']}</li>
-                                    <li><b>Importe:</b> {row['Valor_estimado_del_contrato']} €</li>
+                                    <li><b>Fecha límite:</b> {fecha_limite}</li>
+                                    <li><b>Órgano de contratación:</b> {organo_contratacion}</li>
+                                    <li><b>Importe:</b> {importe} €</li>
                                     <a href='{row['Link_licitación']}' style="color: #007BFF; text-decoration: none;">Más información</a>
                                 </ul>
                             </div>

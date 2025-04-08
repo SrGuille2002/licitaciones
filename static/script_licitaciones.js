@@ -1,6 +1,7 @@
-function validateImportes() {
+function validarCampos() {
     let errorMessageImportes = document.getElementById("error-message-importes");
     let errorMessageFechas = document.getElementById("error-message-fechas");
+    let errorMessageCpv = document.getElementById("error-message-cpv");
 
     // Validación de importes
     let importe1 = document.getElementById("importe1").value.replace(/\./g, ""); // Elimina puntos (formateo previo)
@@ -28,6 +29,18 @@ function validateImportes() {
         return false; // Retorna falso para indicar que la validación falló
     } else {
         errorMessageFechas.style.display = "none"; // Oculta el mensaje de error si la validación pasa
+    }
+
+    // Validación de cpv
+    let cpv = document.getElementById("cpv_search").value;
+
+    // Comprueba si el cpv tiene un formato correcto
+    if (cpv && (cpv.length > 8 || /[^0-9]/.test(cpv))) {
+        errorMessageCpv.textContent = "El CPV no puede tener más de 8 carácteres ni carácteres que no sean números.";
+        errorMessageCpv.style.display = "block"; // Muestra el mensaje de error
+        return false; // Retorna falso para indicar que la validación falló
+    } else {
+        errorMessageCpv.style.display = "none"; // Oculta el mensaje de error si la validación pasa
     }
 }
 
