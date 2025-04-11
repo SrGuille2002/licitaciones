@@ -137,12 +137,12 @@ def nueva_alerta():
     if importe1:
         importe1 = importe1.replace(".", "")
         importe1_formateado = f"{int(importe1):,}".replace(",", ".")  # Formatear con puntos
-        alerta_string += f"IMPORTE MÍNIMO: {importe1_formateado};<br>"
+        alerta_string += f"VALOR MÍNIMO DEL CONTRATO: {importe1_formateado};<br>"
         query += f" AND Valor_estimado_del_contrato >= '{importe1}'"
     if importe2:
         importe2 = importe2.replace(".", "")
         importe2_formateado = f"{int(importe2):,}".replace(",", ".")  # Formatear con puntos
-        alerta_string += f"IMPORTE MÁXIMO {importe2_formateado};<br>"
+        alerta_string += f"VALOR MÁXIMO DEL CONTRATO: {importe2_formateado};<br>"
         query += f" AND Valor_estimado_del_contrato <= '{importe2}'"
     if fecha1:
         fecha1_obj = datetime.strptime(fecha1, "%Y-%m-%d")

@@ -478,8 +478,8 @@ def db_actualizar_licitaciones(df):
 
     # Limpiar los datos
     df = df.replace({pd.NA: None, pd.NaT: None, float('nan'): None})
-    print("Insertando datos de licitaciones")
 
+    print("Insertando datos de licitaciones")
     with engine.connect() as connection:
         for _, row in df.iterrows():
             # Para cada fila del DataFrame, definir la consulta SQL para insertar o actualizar registros en la tabla "licitacion"
@@ -582,8 +582,8 @@ def db_actualizar_consultas(df):
 
     # Limpiar los datos
     df = df.replace({pd.NA: None, pd.NaT: None, float('nan'): None})
-    print("Insertando datos de consultas")
 
+    print("Insertando datos de consultas")
     with engine.connect() as connection:
         for _, row in df.iterrows():
             # Para cada fila del DataFrame, definir la consulta SQL para insertar o actualizar registros en la tabla "consulta"

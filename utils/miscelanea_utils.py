@@ -105,7 +105,6 @@ def procesar_datos_html(tipo_dato, row, cpvs_con_nombre, MAX_CHARACTERS):
                 - cpv_content (str): Contenido HTML formateado para los CPVs.
                 - document_link (str): Enlace HTML al documento o mensaje de inicio de sesión.
                 - fecha_ofe_html (str): Fecha de presentación de ofertas procesada.
-                - fecha_sol_html (str): Fecha de solicitud de participación procesada.
                 - importe_html (str): Valor estimado del contrato procesado.
             - Para otros tipos:
                 - objeto_contrato (str): Objeto de la consulta procesado.
@@ -179,13 +178,6 @@ def procesar_datos_html(tipo_dato, row, cpvs_con_nombre, MAX_CHARACTERS):
         fecha_ofe_html = fecha_ofe
 
     if tipo_dato == "licitaciones": # Campos adicionales de los datos "licitaciones"
-        fecha_sol = row['Fecha_de_presentación_de_solicitudes_de_participacion']
-        if not fecha_sol or fecha_sol == '0000-00-00 00:00:00':
-            fecha_sol = 'No disponible'
-            fecha_sol_html = f"<span style='color: red;'>{fecha_sol}</span>"
-        else:
-            fecha_sol_html = fecha_sol
-
         # Procesar valores de importes Nulos
         importe = row['Valor_estimado_del_contrato']
         if importe == "No disponible":
@@ -193,6 +185,8 @@ def procesar_datos_html(tipo_dato, row, cpvs_con_nombre, MAX_CHARACTERS):
         else:
             importe_html = importe + " €"
 
-        return objeto_contrato, cpv_content, document_link, fecha_ofe_html, fecha_sol_html, importe_html
+        return objeto_contrato, cpv_content, document_link, fecha_ofe_html, importe_html
     else: # tipo de dato "consulta"
         return objeto_contrato, cpv_content, document_link, fecha_ofe_html
+
+

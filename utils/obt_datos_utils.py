@@ -49,12 +49,9 @@ def datos_licitaciones_filtrados(page=1, limit=10, sort_by='Fecha_actualización
     df = df.replace({pd.NaT: None})
     df = df.replace({float('nan'): None})
     df['Fecha_de_presentación_de_ofertas'] = df['Fecha_de_presentación_de_ofertas'].fillna("No disponible")
-    df['Fecha_de_presentación_de_solicitudes_de_participacion'] = df['Fecha_de_presentación_de_solicitudes_de_participacion'].fillna("No disponible")
 
     # Aplicar el formato con decimales para las columnas del dataframe
     df['Valor_estimado_del_contrato'] = df['Valor_estimado_del_contrato'].apply(
-        lambda x: locale.format_string("%.2f", x, grouping=True) if x is not None else 'No disponible')
-    df['Presupuesto_base_sin_impuestos'] = df['Presupuesto_base_sin_impuestos'].apply(
         lambda x: locale.format_string("%.2f", x, grouping=True) if x is not None else 'No disponible')
 
     # Mapear nombres de CPVs
@@ -65,7 +62,7 @@ def datos_licitaciones_filtrados(page=1, limit=10, sort_by='Fecha_actualización
     MAX_CHARACTERS = 150
     result_list = []
     for index, row in df.iterrows():
-        objeto_contrato, cpv_content, document_link, fecha_ofe_html, fecha_sol_html, importe_html = procesar_datos_html("licitaciones", row, cpv_map, MAX_CHARACTERS)
+        objeto_contrato, cpv_content, document_link, fecha_ofe_html, importe_html = procesar_datos_html("licitaciones", row, cpv_map, MAX_CHARACTERS)
 
         result_list.append(
             f"<strong>Título del Contrato:</strong> <span class='contract-object'>{objeto_contrato}</span><br>"
@@ -74,12 +71,11 @@ def datos_licitaciones_filtrados(page=1, limit=10, sort_by='Fecha_actualización
             f"<strong>Órgano de Contratación:</strong> {row['Órgano_de_Contratación'] or 'No disponible'}<br>"
             f"<strong>CPVs:</strong> {cpv_content}<br>"  # Incluir CPVs con hover
             f"<strong>Fecha fin de presentación de ofertas:</strong> {fecha_ofe_html}<br>"
-            f"<strong>Fecha límite de solicitud:</strong> {fecha_sol_html}<br>"
             f"<div class='row-container'>"
-            f"  <div class='left-content'><strong>Importe:</strong> {importe_html}</div>"
+            f"  <div class='left-content'><strong>Valor estimado del contrato:</strong> {importe_html}</div>"
             f"  {document_link}"
             f"</div>"
-            "<hr>"  # Cerrar el div
+            "<hr>"
         )
 
     result = "".join(result_list)
@@ -149,7 +145,7 @@ def datos_consultas_filtrados(page=1, limit=10, sort_by='Fecha_actualización', 
             f"  <div class='left-content'><strong>Fecha límite de respuesta:</strong> {fecha_res_html}</div>"
             f"  {document_link}"
             f"</div>"
-            "<hr>"  # Separador entre resultados
+            "<hr>"
         )
 
     # Unir todos los resultados en una cadena HTML

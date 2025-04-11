@@ -95,7 +95,11 @@ def mandar_alertas():
                 if importe1:
                     query += f" AND Valor_estimado_del_contrato >= '{importe1}'"
                     importe1_formateado = f"{int(importe1):,}".replace(",", ".")  # Formatear con puntos
-                    alerta_string += f"IMPORTE MÍNIMO: {importe1_formateado} "
+                    alerta_string += f"VALOR MÍNIMO DEL CONTRATO: {importe1_formateado} "
+                if importe2:
+                    query += f" AND Valor_estimado_del_contrato <= '{importe2}'"
+                    importe2_formateado = f"{int(importe2):,}".replace(",", ".")  # Formatear con puntos
+                    alerta_string += f"VALOR MÁXIMO DEL CONTRATO: {importe2_formateado} "
                 if fecha1:
                     if isinstance(fecha1, str):
                         fecha1_obj = datetime.strptime(fecha1, "%Y-%m-%d")
@@ -103,6 +107,13 @@ def mandar_alertas():
                         fecha1 = fecha1_sql
                     query += f" AND Fecha_de_presentación_de_ofertas >= '{fecha1}'"
                     alerta_string += f"FECHA MÍNIMA PRESENTACIÓN OFERTAS: {fecha1} "
+                if fecha2:
+                    if isinstance(fecha2, str):
+                        fecha2_obj = datetime.strptime(fecha2, "%Y-%m-%d")
+                        fecha2_sql = fecha2_obj.strftime("%Y-%m-%d")
+                        fecha2 = fecha2_sql
+                    query += f" AND Fecha_de_presentación_de_ofertas <= '{fecha2}'"
+                    alerta_string += f"FECHA MÍNIMA PRESENTACIÓN OFERTAS: {fecha2} "
                 if contrato:
                     query += f" AND Tipo_de_contrato = '{contrato}'"
                     alerta_string += f"TIPO DE CONTRATO: {contrato} "
@@ -112,17 +123,6 @@ def mandar_alertas():
                         Órgano_de_Contratación LIKE '%%{palabra_clave}%%' COLLATE utf8mb4_unicode_ci)
                     """
                     alerta_string += f"PALABRA CLAVE: {palabra_clave} "
-                if importe2:
-                    query += f" AND Valor_estimado_del_contrato <= '{importe2}'"
-                    importe2_formateado = f"{int(importe2):,}".replace(",", ".")  # Formatear con puntos
-                    alerta_string += f"IMPORTE MÁXIMO {importe2_formateado} "
-                if fecha2:
-                    if isinstance(fecha2, str):
-                        fecha2_obj = datetime.strptime(fecha2, "%Y-%m-%d")
-                        fecha2_sql = fecha2_obj.strftime("%Y-%m-%d")
-                        fecha2 = fecha2_sql
-                    query += f" AND Fecha_de_presentación_de_ofertas <= '{fecha2}'"
-                    alerta_string += f"FECHA MÍNIMA PRESENTACIÓN OFERTAS: {fecha2} "
                 with engine.connect() as conn:
                     # Seleccionar las licitaciones que coincidan con los datos de la alerta
                     licitaciones = pd.read_sql(query, conn)
@@ -157,7 +157,7 @@ def mandar_alertas():
                                 <ul style="list-style-type: disc; padding-left: 20px;">
                                     <li><b>Fecha límite:</b> {fecha_limite}</li>
                                     <li><b>Órgano de contratación:</b> {organo_contratacion}</li>
-                                    <li><b>Importe:</b> {importe} €</li>
+                                    <li><b>Valor estimado del contrato:</b> {importe} €</li>
                                     <a href='{row['Link_licitación']}' style="color: #007BFF; text-decoration: none;">Más información</a>
                                 </ul>
                             </div>

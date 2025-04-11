@@ -137,8 +137,8 @@
                         {% if alerta['palabra_clave'] %}<p><strong>Palabra Clave:</strong> {{ alerta['palabra_clave'] }}</p>{% endif %}
                         {% if alerta['fecha1'] %}<p><strong>Fecha mínima:</strong> {{ alerta['fecha1'] }}</p>{% endif %}
                         {% if alerta['fecha2'] %}<p><strong>Fecha máxima:</strong> {{ alerta['fecha2'] }}</p>{% endif %}
-                        {% if alerta['importe1'] %}<p><strong>Importe mínimo:</strong> {{ alerta['importe1'] }}</p>{% endif %}
-                        {% if alerta['importe2'] %}<p><strong>Importe máximo:</strong> {{ alerta['importe2'] }}</p>{% endif %}
+                        {% if alerta['importe1'] %}<p><strong>Valor mínimo del contrato:</strong> {{ alerta['importe1'] }}</p>{% endif %}
+                        {% if alerta['importe2'] %}<p><strong>Valor máximo del contrato:</strong> {{ alerta['importe2'] }}</p>{% endif %}
                     </div>
                     <!-- Botón para eliminar la alerta -->
                     <form method="POST" action="/alertas/alerta/eliminar" style="margin: 0; padding: 0;">

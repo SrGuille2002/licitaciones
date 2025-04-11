@@ -3,7 +3,7 @@ from unittest.mock import patch
 from sqlalchemy import text
 from flask_app import app
 from config import engine
-from utils import db_get_user_id_by_email, db_get_user_by_email, db_create_user_by_all, datos_licitaciones_filtrados, db_get_top3_recomendaciones_by_user_id, db_create_alerta_by_all
+from utils import db_get_user_id_by_email, db_get_user_by_email, db_create_user_by_all, datos_licitaciones_filtrados, db_get_top3_recomendaciones_by_user_id, db_create_alerta_by_all, get_alertas
 
 class TestAppFunctions(unittest.TestCase):
     """
@@ -73,7 +73,7 @@ class TestAppFunctions(unittest.TestCase):
 
     def test_obtener_datos_iniciales(self):
         """
-        Prueba la función obtener_datos_iniciales.
+        Prueba la función datos_licitaciones_filtrados.
         """
         # Insertar datos de prueba en la tabla 'licitacion'
         with engine.connect() as conn:
@@ -92,10 +92,10 @@ class TestAppFunctions(unittest.TestCase):
                     "fecha_limite": "2025-10-02"
                 }
             )
-            
+
         # Simular un contexto de solicitud completo
         with app.test_request_context():
-            
+
             # Simular datos en la sesión
             with self.app.session_transaction() as session:
                 session['email'] = self.email
@@ -129,16 +129,16 @@ class TestAppFunctions(unittest.TestCase):
         # Obtener su id
         user_id = db_get_user_id_by_email(self.email)
 
-        # Verificar que el usuario fue creado
+        # Creación de la alerta
         db_create_alerta_by_all(user_id, self.cpv_search, self.contrato, self.palabra_clave, self.fecha1, self.fecha2, self.importe1, self.importe2)
-            
+
         # Consultar si la alerta fue creada
         with engine.connect() as conn:
             alerta = conn.execute(
                 text("SELECT * FROM alertas WHERE id_usuario = :user_id"),
                 {"user_id": user_id}
             ).fetchone()
-            
+
         self.assertIsNotNone(alerta, "La alerta no debería ser None")
         self.assertEqual(alerta["id_usuario"], user_id, "El is del usuario no coincide")
 
@@ -148,7 +148,7 @@ class TestAppFunctions(unittest.TestCase):
         """
         # Crear un usuario de prueba
         db_create_user_by_all(self.email, self.password)
-        
+
         # Obtener su id
         user_id = db_get_user_id_by_email(self.email)
 
@@ -225,14 +225,38 @@ class TestAppFunctions(unittest.TestCase):
         self.assertEqual(response.status_code, 302, "La creación de la alerta debería redirigir al usuario")
 
         # Consultar las alertas creadas
-        with engine.connect() as conn:
-            alertas = conn.execute(
-                text("SELECT * FROM alertas WHERE id_usuario = :user_id"),
-                {"user_id": db_get_user_id_by_email(self.email)}
-            ).fetchall()
+        user_id = db_get_user_id_by_email(self.email)
+        alertas = get_alertas(user_id)
 
         # Verificar que se haya creado al menos una alerta
         self.assertTrue(len(alertas) > 0, "Debería haber al menos una alerta creada")
+
+        #####################
+
+    # def test_actualizacion_datos_usuario(self):
+    #     """
+    #     Prueba la actualización de datos del usuario.
+    #     """
+    #     # Registrar un usuario
+    #     db_create_user_by_all("test@example.com", "securepassword123")
+
+    #     # Simular inicio de sesión
+    #     with self.client.session_transaction() as session:
+    #         session['email'] = "test@example.com"
+
+    #     # Actualizar el correo electrónico
+    #     response = self.client.post(
+    #         "/actualizar_datos",
+    #         data={"email": "new_email@example.com", "password": "newpassword123"},
+    #         follow_redirects=True
+    #     )
+    #     self.assertEqual(response.status_code, 200, "La actualización debería ser exitosa")
+
+    #     # Verificar que los datos se hayan actualizado en la base de datos
+    #     with engine.connect() as conn:
+    #         user = conn.execute(text("SELECT * FROM usuarios WHERE email = :email"), {"email": "new_email@example.com"}).fetchone()
+    #         self.assertIsNotNone(user, "El usuario debería haberse actualizado")
+    #         self.assertEqual(user["email"], "new_email@example.com", "El correo electrónico no coincide")
 
     def test_eliminacion_alerta(self):
         """
@@ -278,13 +302,13 @@ class TestAppFunctions(unittest.TestCase):
         # Verificar que la alerta ya no exista
         with engine.connect() as conn:
             alertas = conn.execute(text("SELECT * FROM alertas WHERE id = :id"), {"id": alerta_id}).fetchone()
-            self.assertEqual(alertas, None, "La alerta debería haber sido eliminada")
+        self.assertEqual(alertas, None, "La alerta debería haber sido eliminada")
 
     ### PRUEBAS FUNCIONALES
 
     def test_home_page(self):
         """
-        Prueba la funcionalidad de la página principal.
+        Prueba la funcionalidad de la página de inicio de sesión.
         """
         response = self.app.get("/")
         self.assertEqual(response.status_code, 200, "La página principal debería cargarse correctamente")
@@ -358,12 +382,9 @@ class TestAppFunctions(unittest.TestCase):
             )
             self.assertEqual(response.status_code, 302, "El registro debería redirigir al usuario")
             # Verificar que el usuario fue creado
-            with engine.connect() as conn:
-                user = conn.execute(
-                    text("SELECT * FROM usuarios WHERE email = :email"),
-                    {"email": self.email}
-                ).fetchone()
+            user = db_get_user_by_email(self.email)
             self.assertIsNotNone(user, "El usuario no debería ser None")
+
             # Verificar que el correo fue enviado
             mock_send_mail.assert_called_once()  # Verifica que mail.send fue llamado exactamente una vez
 
